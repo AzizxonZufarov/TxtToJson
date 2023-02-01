@@ -1,13 +1,24 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using TxtToJson.Data.Interfaces;
 using TxtToJson.Data.Models;
 
 namespace TxtToJson.Data.Repositories
 {
-    public class CarRepository /*: ICar*/
+    public interface ICarRepository
     {
-       /* public IEnumerable<Car> AllCars() => Car;
+        Car[] All();        
+    }
 
-        public Car GetCarsInRange();*/
+    public class ReadonlyCarFileRepository : ICarRepository
+    {
+    
+    }
+    
+    public static class CarHelper
+    {
+        public Car FromString(string value)
+        {
+            return new Car();
+        }
     }
 }
