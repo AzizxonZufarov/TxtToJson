@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -10,13 +10,58 @@ using TxtToJson.Data.Models;
 
 namespace TxtToJson.Controllers
 {
+    // Здесь не требуется никакой логики, т.к. логика по чтению файла должна быть в репозитории
+    
     public class FileController : Controller
     {
+        private readonly ICarRepository _carRepository;
+    
+        public FileController(ICarRepository carRepository)
+        {
+            _carRepository = carRepository;
+        }
+    
+        // лишнее
         public IActionResult FileUpload()
         {
             return View();
         }
-
+        
+        [HttpGet]
+        [Route("cars")]
+        public async Task<IActionResult> GetAll()
+        {
+            var cars = _carRepository.All();
+            
+            return Ok(cars);
+            
+            // Логику обработки файла в репозиторий
+            // Можно прочесть все строки файла 1 методом
+            // var lines = File.ReadAllLines(filePath);
+            
+            List<Car> cars = new List<Car>();
+            using (var CurrentFile = new StreamReader(file.FileName))
+            {
+                string line = string.Empty;
+                while ((line = CurrentFile.ReadLine()) != null)
+                {
+                    if (line.Trim() == "")
+                        continue;
+                    var parts = line.Split(';');
+                    cars.Add(
+                        new Car()
+                        {
+                            CarName = parts[0] + " " + parts[1],
+                            Price = Convert.ToInt32(parts[2]),
+                            Year = Convert.ToInt32(parts[3]),
+                        });
+                };
+                TempData["msg"] = "Uploaded!";
+                return Ok(JsonConvert.SerializeObject(cars, Formatting.Indented));
+            }
+        }
+        
+        // лишнее
         [HttpPost]
         public async Task<IActionResult> FileUpload(IFormFile file)
         {
